@@ -41,6 +41,7 @@ var (
 
 	//nolint:gochecknoglobals
 	requiredFields = []requiredField{
+		{qField: idQField, label: "id"},
 		{qField: uuidQField, label: "uuid"},
 		{qField: nameQField, label: "name"},
 		{qField: driverModelCurrentQField, label: "driver_model_current"},
@@ -189,6 +190,7 @@ func (e *GPUExporter) Collect(metricCh chan<- prometheus.Metric) {
 	}
 
 	for _, currentRow := range currentTable.Rows {
+		id := currentRow.QFieldToCells[idQField].RawValue
 		uuid := strings.TrimPrefix(strings.ToLower(currentRow.QFieldToCells[uuidQField].RawValue), "gpu-")
 		name := currentRow.QFieldToCells[nameQField].RawValue
 		driverModelCurrent := currentRow.QFieldToCells[driverModelCurrentQField].RawValue
@@ -197,7 +199,7 @@ func (e *GPUExporter) Collect(metricCh chan<- prometheus.Metric) {
 		driverVersion := currentRow.QFieldToCells[driverVersionQField].RawValue
 
 		infoMetric := prometheus.MustNewConstMetric(e.gpuInfoDesc, prometheus.GaugeValue,
-			1, uuid, name, driverModelCurrent,
+			1, id, uuid, name, driverModelCurrent,
 			driverModelPending, vBiosVersion, driverVersion)
 		metricCh <- infoMetric
 
